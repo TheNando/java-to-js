@@ -1,39 +1,33 @@
-import java.awt.event.KeyEvent;
+// import java.awt.event.KeyEvent;
 
 class UserInput {
-  private boolean[] k = new boolean[32767];
-  int mouseEvent;
-  private boolean isTriggerPressed;
-
-  public boolean isTriggerPressed() {
-    return isTriggerPressed;
+  constructor() {
+    this.k = new boolean[32767];
+    this.mouseEvent = null;
+    this.isTriggerPressed = false;
   }
 
-  public void setTriggerPressed(boolean isTriggerPressed) {
+  setTriggerPressed(isTriggerPressed) {
     this.isTriggerPressed = isTriggerPressed;
   }
 
-  public UserInput() {
-    isTriggerPressed = false;
-  }
-
-  void handleKeyboardInput(Point movement) {
+  handleKeyboardInput(movement) {
     // Move the player according to keyboard state.
-    if (k[KeyEvent.VK_A])
-      movement.x--;
-    if (k[KeyEvent.VK_D])
-      movement.x++;
-    if (k[KeyEvent.VK_W])
-      movement.y--;
-    if (k[KeyEvent.VK_S])
-      movement.y++;
+    if (this.k[KeyEvent.VK_A])
+      movement.x -= 1;
+    if (this.k[KeyEvent.VK_D])
+      movement.x += 1;
+    if (this.k[KeyEvent.VK_W])
+      movement.y -= 1;
+    if (this.k[KeyEvent.VK_S])
+      movement.y += 1;
   }
 
-  public boolean isReloadPressed() {
-    return k[KeyEvent.VK_R];
+  isReloadPressed() {
+    return this.k[KeyEvent.VK_R];
   }
 
-  public void setIsPressed(int keyCode, boolean isPressed) {
-    k[keyCode] = isPressed;
+  setIsPressed(keyCode, isPressed) {
+    this.k[keyCode] = isPressed;
   }
 }

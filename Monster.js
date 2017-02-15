@@ -1,163 +1,157 @@
-import java.util.Random;
+// import java.util.Random;
 
 class Monster {
-  private static final Random random = new Random();
+  constructor(index) {
+    this.activity = null;
+    this.damage = null;
+    this.direction = null;
+    this.frame = null;
+    this.rage = null;
+    this.savedMapPixel = null;
+    this.wanderDirection = null;
 
-  private final int index;
-  Point position;
-  private int direction;
-  private int frame;
-  private int wanderDirection;
-  private int rage;
-  private int damage;
-  private int activity;
-  private int savedMapPixel;
-
-  public Monster(int index) {
     this.index = index;
-    position = new Point(0, 0);
+    this.position = new Point(0, 0);
   }
 
-  public void advanceSpriteFrame() {
-    frame++;
+  advanceSpriteFrame() {
+    this.frame += 1;
   }
 
-  void agitate() {
-    rage++;
+  agitate() {
+    this.rage += 1;
   }
 
-  boolean canSeePlayer(double rx, double ry) {
+  canSeePlayer(rx, ry) {
     return rx > -32 && rx < 220 && ry > -32 && ry < 32;
   }
 
-  int getDirection() {
-    return direction;
+  hasTakenDamage() {
+    return this.damage > 0;
   }
 
-  int getFrame() {
-    return this.frame;
+  isActive() {
+    return this.activity != 0;
   }
 
-  int getIndex() {
-    return index;
+  isEarly() {
+    return this.index <= 128;
   }
 
-  int getSavedMapPixel() {
-    return savedMapPixel;
-  }
-
-  boolean hasTakenDamage() {
-    return damage > 0;
-  }
-
-  boolean isActive() {
-    return activity != 0;
-  }
-
-  boolean isEarly() {
-    return getIndex() <= 128;
-  }
-
-  boolean isMouthTouchingPlayer(double rx, double ry) {
+  isMouthTouchingPlayer(rx, ry) {
     return rx > -6 && rx < 6 && ry > -6 && ry < 6 && !isPlayer();
   }
 
-  boolean isPlayer() {
-    return getIndex() == 0;
+  isPlayer() {
+    return this.index == 0;
   }
 
-  boolean isSomewhatEnraged() {
-    return rage >= 8;
+  isSomewhatEnraged() {
+    return this.rage >= 8;
   }
 
-  boolean isSpecial() {
-    return getIndex() >= 255;
+  isSpecial() {
+    return this.index >= 255;
   }
 
-  void markActive() {
-    activity = 1;
+  markActive() {
+    this.activity = 1;
   }
 
-  void markDamaged() {
-    damage = 1;
+  markDamaged() {
+    this.damage = 1;
   }
 
-  void markEnraged() {
-    rage = 127;
+  markEnraged() {
+    this.rage = 127;
   }
 
-  void markInactive() {
-    activity = 0;
+  markInactive() {
+    this.activity = 0;
   }
 
-  void move(Map map, Point movement) {
+  move(map, movement) {
     // Restore prior pixel.
-    map.setElement(position.x, position.y, getSavedMapPixel());
+    map.setElement(this.position.x, this.position.y, this.savedMapPixel);
 
     // New position.
-    position.x += movement.x;
-    position.y += movement.y;
+    this.position.x += movement.x;
+    this.position.y += movement.y;
 
     // Remember new pixel's contents.
-    setSavedMapPixel(map.getElement(position.x, position.y));
+    this.savedMapPixel = map.getElement(this.position.x, this.position.y);
 
     // Put ourselves here.
-    map.setMonsterHead(position.x, position.y);
+    map.setMonsterHead(this.position.x, this.position.y);
   }
 
-  void pickWanderDirection() {
-    wanderDirection = random.nextInt(25);
+  pickWanderDirection() {
+    this.wanderDirection = random.nextInt(25);
   }
 
-  void place(int x, int y, int rushTime, int pixelToSave) {
-    position.x = x;
-    position.y = y;
+  place(x, y, rushTime, pixelToSave) {
+    this.position.x = x;
+    this.position.y = y;
 
     // Remember this map pixel.
-    setSavedMapPixel(pixelToSave);
+    this.savedMapPixel = pixelToSave;
 
     // Mark monster as idle or attacking.
-    rage = (rushTime > 0 || random.nextInt(3) == 0) ? 127 : 0;
+    this.rage = (rushTime > 0 || random.nextInt(3) == 0) ? 127 : 0;
 
     // Mark monster active.
-    activity = 1;
+    this.activity = 1;
 
     // Distribute the monsters' initial direction.
-    setDirection(getIndex() & 15);
+    this.direction = this.index & 15;
   }
 
-  void processDamage(Map map, Game game, double playerDir, int xPos, int yPos) {
-    // Add to monster's cumulative damage and reset temporary damage.
-    activity += random.nextInt(3) + 1;
-    damage = 0;
+  processDamage(map, game, playerDir, xPos, yPos) {
+    let rot;
+    let amount;
+    let poww;
+    let pow;
+    let dir;
+    let xdd;
+    let ydd;
+    let col;
+    let i;
+    let j;
+    let xd;
+    let yd;
 
-    double rot = 0.25; // How far around the blood spreads, radians
-    int amount = 8; // How much blood
-    double poww = 32; // How far to spread the blood
+    // Add to monster's cumulative damage and reset temporary damage.
+    this.activity += random.nextInt(3) + 1;
+    this.damage = 0;
+
+    rot = 0.25; // How far around the blood spreads, radians
+    amount = 8; // How much blood
+    poww = 32; // How far to spread the blood
 
     // Is this monster sufficiently messed up to die?
-    if (activity >= 2 + game.getLevel()) {
+    if (this.activity >= 2 + game.getLevel()) {
       rot = Math.PI * 2; // All the way around
       amount = 60; // lots of blood
       poww = 16;
       map.setElement(xPos, yPos, 0xa00000); // Red
-      activity = 0; // Kill monster
+      this.activity = 0; // Kill monster
       game.addScoreForMonsterDeath();
     }
 
     // Draw blood.
-    for (int i = 0; i < amount; i++) {
-      double pow = (random.nextInt(100) * random.nextInt(100)) * poww / 10000
-          + 4;
-      double dir = (random.nextInt(100) - random.nextInt(100)) / 100.0 * rot;
-      double xdd = (Math.cos(playerDir + dir) * pow) + random.nextInt(4)
-          - random.nextInt(4);
-      double ydd = (Math.sin(playerDir + dir) * pow) + random.nextInt(4)
-          - random.nextInt(4);
-      int col = (random.nextInt(128) + 120);
-      bloodLoop: for (int j = 2; j < pow; j++) {
-        int xd = (int) (xPos + xdd * j / pow);
-        int yd = (int) (yPos + ydd * j / pow);
+    for (i = 0; i < amount; i++) {
+      pow = (random.nextInt(100) * random.nextInt(100)) * poww / 10000 + 4;
+      dir = (random.nextInt(100) - random.nextInt(100)) / 100.0 * rot;
+      xdd = (Math.cos(playerDir + dir) * pow) + random.nextInt(4) - random.nextInt(4);
+      ydd = (Math.sin(playerDir + dir) * pow) + random.nextInt(4) - random.nextInt(4);
+      col = (random.nextInt(128) + 120);
+
+      // TODO: loop label
+      bloodLoop: for (j = 2; j < pow; j++) {
+        // xd = (int) (xPos + xdd * j / pow);
+        // yd = (int) (yPos + ydd * j / pow);
+        xd = Math.floor(xPos + xdd * j / pow);
+        yd = Math.floor(yPos + ydd * j / pow);
 
         // If the blood encounters a wall, stop spraying.
         if (map.isAnyWallSafe(xd, yd)) {
@@ -173,26 +167,18 @@ class Monster {
     }
   }
 
-  void setAsPlayer(Point startPoint) {
-    position = startPoint;
-    setSavedMapPixel(0x808080);
-    markActive();
+  setAsPlayer(startPoint) {
+    this.position = startPoint;
+    this.savedMapPixel = 0x808080;
+    this.markActive();
   }
 
-  void setDirection(int direction) {
-    this.direction = direction;
-  }
-
-  private void setSavedMapPixel(int savedMapPixel) {
-    this.savedMapPixel = savedMapPixel;
-  }
-
-  void wanderToward(Point distanceToPlayer) {
-    if (wanderDirection != 12) {
-      distanceToPlayer.x = (wanderDirection) % 5 - 2;
-      distanceToPlayer.y = (wanderDirection) / 5 - 2;
+  wanderToward(distanceToPlayer) {
+    if (this.wanderDirection != 12) {
+      distanceToPlayer.x = (this.wanderDirection) % 5 - 2;
+      distanceToPlayer.y = (this.wanderDirection) / 5 - 2;
       if (random.nextInt(10) == 0) {
-        wanderDirection = 12;
+        this.wanderDirection = 12;
       }
     }
   }

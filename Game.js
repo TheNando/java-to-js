@@ -1,168 +1,135 @@
-import java.awt.Graphics;
-import java.util.Random;
+// import java.awt.Graphics;
+// import java.util.Random;
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
 
 class Game {
-  // Fields that are reset during attract.
-  private int score;
-  private int hurtTime; // Makes the screen red when player is getting bitten.
-  private int bonusTime;
+  constructor() {
+    // Fields that are reset during attract.
+    this.bonusTime = null;
+    this.hurtTime = null; // Makes the screen red when player is getting bitten
+    this.score = null;
 
-  // Fields that are reset when entering attract.
-  private boolean isStarted;
-  private int level;
-  private int shootDelay;
-  private int rushTime;
-  private int damage;
-  private int ammo;
-  private int clips;
-  private int tick;
-
-  void addScoreForMonsterDeath() {
-    score += level;
+    // Fields that are reset when entering attract.
+    this.ammo = null;
+    this.clips = null;
+    this.damage = null;
+    this.isStarted = false;
+    this.level = null;
+    this.rushTime = null;
+    this.shootDelay = null;
+    this.tick = null;
+  }
+  
+  addScoreForMonsterDeath() {
+    this.score += this.level;
   }
 
-  void advanceRushTime(Random random) {
-    if (++rushTime >= 150) {
-      rushTime = -random.nextInt(2000);
+  advanceRushTime() {
+    this.rushTime += 1;
+    if (this.rushTime >= 150) {
+      this.rushTime = -random.nextInt(2000);
     }
   }
 
   // Returns true if OK to shoot now.
-  boolean advanceShotTimer() {
-    return shootDelay-- < 0;
+  advanceShotTimer() {
+    this.shootDelay -= 1;
+    return this.shootDelay < 0;
   }
 
-  void advanceTick() {
-    tick++;
+  advanceTick() {
+    this.tick++;
   }
 
-  void consumeAmmo(int amount) {
-    ammo += amount;
+  consumeAmmo(amount) {
+    this.ammo += amount;
   }
 
-  void decayBonusTime() {
-    bonusTime = bonusTime * 8 / 9;
+  decayBonusTime() {
+    this.bonusTime = this.bonusTime * 8 / 9;
   }
 
-  void decayHurt() {
-    hurtTime /= 2;
+  decayHurt() {
+    this.hurtTime /= 2;
   }
 
-  void drawLevel(Graphics ogr) {
-    ogr.drawString("Level " + level, 90, 70);
+  // drawLevel(ogr) {
+  //   ogr.drawString('Level ' + this.level, 90, 70);
+  // }
+
+  inflictNibbleDamage() {
+    this.damage += 1;
+    this.hurtTime += 20;
   }
 
-  int getAmmo() {
-    return this.ammo;
+  isAmmoAvailable() {
+    return this.ammo < 220;
   }
 
-  int getBonusTime() {
-    return this.bonusTime;
+  isAmmoFull() {
+    return this.ammo <= 20;
   }
 
-  int getClips() {
-    return this.clips;
-  }
-
-  int getDamage() {
-    return this.damage;
-  }
-
-  int getHurtTime() {
-    return this.hurtTime;
-  }
-
-  int getLevel() {
-    return this.level;
-  }
-
-  int getRushTime() {
-    return this.rushTime;
-  }
-
-  int getScore() {
-    return this.score;
-  }
-
-  int getShootDelay() {
-    return this.shootDelay;
-  }
-
-  int getTick() {
-    return this.tick;
-  }
-
-  void inflictNibbleDamage() {
-    damage++;
-    hurtTime += 20;
-  }
-
-  boolean isAmmoAvailable() {
-    return getAmmo() < 220;
-  }
-
-  boolean isAmmoFull() {
-    return getAmmo() <= 20;
-  }
-
-  boolean isStarted() {
+  isStarted() {
     return this.isStarted;
   }
 
-  void markGameStarted() {
-    score = 0;
-    isStarted = true;
-    System.out.println("Starting new game...");
+  markGameStarted() {
+    this.score = 0;
+    this.isStarted = true;
+    console.log('Starting new game...');
   }
 
-  Random randomForLevel() {
-    return new Random(4329 + level);
+  randomForLevel() {
+    return new Random(4329 + this.level);
   }
 
-  void reloadGun() {
-    shootDelay = 30;
-    ammo = 20;
-    clips += 10;
+  reloadGun() {
+    this.shootDelay = 30;
+    this.ammo = 20;
+    this.clips += 10;
   }
 
-  void resetBonusTime() {
-    bonusTime = 120;
+  resetBonusTime() {
+    this.bonusTime = 120;
   }
 
-  void resetClips() {
-    clips = 20;
+  resetClips() {
+    this.clips = 20;
   }
 
-  void resetDamage() {
-    damage = 20;
+  resetDamage() {
+    this.damage = 20;
   }
 
-  void restart() {
-    isStarted = false;
-    level = 0;
-    shootDelay = 0;
-    rushTime = 150;
-    damage = 20;
-    ammo = 20;
-    clips = 20;
-    System.out.println("Entering attract...");
+  restart() {
+    this.isStarted = false;
+    this.level = 0;
+    this.shootDelay = 0;
+    this.rushTime = 150;
+    this.damage = 20;
+    this.ammo = 20;
+    this.clips = 20;
+    console.log('Entering attract...');
   }
 
-  void setLongShootDelay() {
-    shootDelay = 2;
+  setLongShootDelay() {
+    this.shootDelay = 2;
   }
 
-  void setMaxHurt() {
-    hurtTime = 255;
+  setMaxHurt() {
+    this.hurtTime = 255;
   }
 
-  void setShortShootDelay() {
-    shootDelay = 1;
+  setShortShootDelay() {
+    this.shootDelay = 1;
   }
 
-  void winLevel() {
-    ++level;
-    tick = 0;
-    System.out.println("Advancing to level " + level + "...");
+  winLevel() {
+    this.level += 1;
+    this.tick = 0;
+    console.log(`Advancing to level ${level}...`);
   }
 }

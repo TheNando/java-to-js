@@ -1,29 +1,16 @@
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferInt;
-import java.util.Random;
+// import java.awt.Graphics;
+// import java.awt.image.BufferedImage;
+// import java.awt.image.DataBufferInt;
+// import java.util.Random;
+
+const PIXEL_ZOMBIE_SKIN = 0xa0ff90;
+const PIXEL_SKIN = 0xFF9993;
 
 class Viewport {
-  private final int width;
-  private final int width_half;
-  private final int height;
-  private final int height_half;
+  constructor(width, height, screenWidth, screenHeight, graphics) {
+    // Graphics ogr;
+    // Graphics sg;
 
-  private final BufferedImage image;
-  private final Graphics ogr;
-  private final Graphics sg;
-
-  private final int[] pixels;
-  private final int[] lightmap;
-  private final int[] brightness;
-  private final int[] sprites;
-
-  private final Random random = new Random();
-  private int screenWidth;
-  private int screenHeight;
-
-  Viewport(int width, int height, int screenWidth, int screenHeight,
-      Graphics graphics) {
     this.width = width;
     this.width_half = width / 2;
     this.height = height;
@@ -32,39 +19,51 @@ class Viewport {
     this.screenWidth = screenWidth;
     this.screenHeight = screenHeight;
 
-    image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-    ogr = image.getGraphics();
-    sg = graphics;
+    this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    this.ogr = this.image.getGraphics();
+    this.sg = graphics;
 
-    pixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
-    lightmap = new int[width * height];
+    // Array of game image
+    this.pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
+    this.lightmap = new int[width * height];
 
-    brightness = new int[512];
-    generateBrightness();
+    this.brightness = new int[512];
+    this.generateBrightness();
 
-    sprites = new int[18 * 4 * 16 * 12 * 12];
-    generateSprites();
+    this.sprites = new int[18 * 4 * 16 * 12 * 12];
+    this.generateSprites();
   }
 
   /**
    * Generates a bunch of top-down sprites using surprisingly compact code.
    */
-  private void generateSprites() {
-    final int PIXEL_ZOMBIE_SKIN = 0xa0ff90;
-    final int PIXEL_SKIN = 0xFF9993;
+  generateSprites() {
+    let pix = 0;
+    let i;
+    let skin;
+    let clothes;
+    let t;
+    let d;
+    let dir;
+    let cos;
+    let sin;
+    let x;
+    let y;
+    let col;
+    let xPix;
+    let yPix;
 
-    int pix = 0;
-    for (int i = 0; i < 18; i++) {
-      int skin = PIXEL_SKIN;
-      int clothes = 0xFFffff;
+    for (i = 0; i < 18; i++) {
+      skin = PIXEL_SKIN;
+      clothes = 0xFFffff;
 
       if (i > 0) {
         skin = PIXEL_ZOMBIE_SKIN;
         clothes = (random.nextInt(0x1000000) & 0x7f7f7f);
       }
-      for (int t = 0; t < 4; t++) {
-        for (int d = 0; d < 16; d++) {
-          double dir = d * Math.PI * 2 / 16.0;
+      for (t = 0; t < 4; t++) {
+        for (d = 0; d < 16; d++) {
+          dir = d * Math.PI * 2 / 16.0;
 
           if (t == 1)
             dir += 0.5 * Math.PI * 2 / 16.0;
@@ -76,14 +75,16 @@ class Viewport {
           // dir = d * Math.PI * 2 / 64;
           // }
 
-          double cos = Math.cos(dir);
-          double sin = Math.sin(dir);
+          cos = Math.cos(dir);
+          sin = Math.sin(dir);
 
-          for (int y = 0; y < 12; y++) {
-            int col = 0x000000;
-            for (int x = 0; x < 12; x++) {
-              int xPix = (int) (cos * (x - 6) + sin * (y - 6) + 6.5);
-              int yPix = (int) (cos * (y - 6) - sin * (x - 6) + 6.5);
+          for (y = 0; y < 12; y++) {
+            col = 0x000000;
+            for (x = 0; x < 12; x++) {
+              // xPix = (int) (cos * (x - 6) + sin * (y - 6) + 6.5);
+              // yPix = (int) (cos * (y - 6) - sin * (x - 6) + 6.5);
+              xPix = Math.floor(cos * (x - 6) + sin * (y - 6) + 6.5);
+              yPix = Math.floor(cos * (y - 6) - sin * (x - 6) + 6.5);
 
               if (i == 17) {
                 if (xPix > 3 && xPix < 9 && yPix > 3 && yPix < 9) {
@@ -102,7 +103,7 @@ class Viewport {
                   col = skin;
                 }
               }
-              sprites[pix++] = col;
+              this.sprites[pix++] = col;
 
               // If we just drew a pixel, make the next one an almost-black
               // pixel, and if it's already an almost-black one, make it
@@ -122,24 +123,41 @@ class Viewport {
     }
   }
 
-  private void generateBrightness() {
-    double offs = 30;
-    for (int i = 0; i < 512; i++) {
-      brightness[i] = (int) (255.0 * offs / (i + offs));
+  generateBrightness() {
+    let offs = 30;
+    let i;
+    for (i = 0; i < 512; i++) {
+      // this.brightness[i] = (int) (255.0 * offs / (i + offs));
+      this.brightness[i] = Math.floor(255.0 * offs / (i + offs));
       if (i < 4)
-        brightness[i] = brightness[i] * i / 4;
+        this.brightness[i] = this.brightness[i] * i / 4;
     }
   }
 
-  private void calculateLightmap(Map map, int tick, double playerDir,
-      Point camera) {
-    for (int i = 0; i < width * 4; i++) {
-      // Calculate a point along the outer wall of the view.
-      int xt = i % width - width_half;
-      int yt = (i / height % 2) * (height - 1) - height_half;
+  calculateLightmap(map, tick, playerDir, camera) {
+    let i;
+    let j;
+    let xt;
+    let yt;
+    let tmp;
+    let dd;
+    let brr;
+    let dist;
+    let xx;
+    let yy;
+    let xm;
+    let ym;
+    let xd;
+    let yd;
+    let ddd;
+    let br;
+    for (i = 0; i < width * 4; i++) {
+      // Calculate a along the outer wall of the view.
+      xt = i % width - width_half;
+      yt = (i / height % 2) * (height - 1) - height_half;
 
       if (i >= width * 2) {
-        int tmp = xt;
+        tmp = xt;
         xt = yt;
         yt = tmp;
       }
@@ -151,7 +169,7 @@ class Viewport {
       // flashlight effect in front of the player.
       //
       // Clamp to a circle (2 x pi).
-      double dd = Math.atan2(yt, xt) - playerDir;
+      dd = Math.atan2(yt, xt) - playerDir;
       if (dd < -Math.PI)
         dd += Math.PI * 2;
       if (dd >= Math.PI)
@@ -160,9 +178,10 @@ class Viewport {
       // This calculation is weird because of the 1- and the *255. It seems
       // arbitrary. Maybe it is. brr is probably supposed to stand for
       // something like "brightness times radius squared."
-      int brr = (int) ((1 - dd * dd) * 255);
+      // brr = (int) ((1 - dd * dd) * 255);
+      brr = Math.floor((1 - dd * dd) * 255);
 
-      int dist = width_half;
+      dist = width_half;
       if (brr < 0) {
         // Cut off the flashlight past a certain angle, but for better
         // playability leave a small halo going all the way around the player.
@@ -173,15 +192,14 @@ class Viewport {
       if (tick < 60)
         brr = brr * tick / 60;
 
-      int j = 0;
-      for (; j < dist; j++) {
+      for (j = 0; j < dist; j++) {
         // Loop through the beam's pixels one fraction of the total distance
         // each iteration. This is very slightly inefficient because in some
         // cases we'll calculate the same pixel twice.
-        int xx = xt * j / width_half + width_half;
-        int yy = yt * j / height_half + height_half;
-        int xm = xx + camera.x - width_half;
-        int ym = yy + camera.y - height_half;
+        xx = xt * j / width_half + width_half;
+        yy = yt * j / height_half + height_half;
+        xm = xx + camera.x - width_half;
+        ym = yy + camera.y - height_half;
 
         // Stop the light if it hits a wall.
         if (map.isWallSafe(xm, ym))
@@ -190,83 +208,95 @@ class Viewport {
         // Do an approximate distance calculation. I'm not sure why this
         // couldn't have been built into the brightness table, which would let
         // us easily index using j.
-        int xd = (xx - width_half) * 256 / width_half;
-        int yd = (yy - height_half) * 256 / height_half;
-        int ddd = (xd * xd + yd * yd) / 256;
-        int br = brightness[ddd] * brr / 255;
+        xd = (xx - width_half) * 256 / width_half;
+        yd = (yy - height_half) * 256 / height_half;
+        ddd = (xd * xd + yd * yd) / 256;
+        br = this.brightness[ddd] * brr / 255;
 
         // Draw the halo around the player.
         if (ddd < 16) {
-          int tmp = 128 * (16 - ddd) / 16;
+          tmp = 128 * (16 - ddd) / 16;
           br = br + tmp * (255 - br) / 255;
         }
 
         // Fill in the lightmap entry.
-        lightmap[xx + yy * width] = br;
+        this.lightmap[xx + yy * width] = br;
       }
     }
   }
 
-  private void drawNoiseAndHUD(Game game) {
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        int noise = random.nextInt(16) * random.nextInt(16) / 16;
+  drawNoiseAndHUD(game) {
+    let y;
+    let x;
+    let noise;
+    let c;
+    let l;
+    let r;
+    let g;
+    let b;
+    for (y = 0; y < height; y++) {
+      for (x = 0; x < width; x++) {
+        noise = random.nextInt(16) * random.nextInt(16) / 16;
         if (!game.isStarted())
           noise *= 4;
 
-        int c = pixels[x + y * width];
-        int l = lightmap[x + y * width];
-        lightmap[x + y * width] = 0;
-        int r = ((c >> 16) & 0xff) * l / 255 + noise;
-        int g = ((c >> 8) & 0xff) * l / 255 + noise;
-        int b = ((c) & 0xff) * l / 255 + noise;
+        c = this.pixels[x + y * width];
+        l = this.lightmap[x + y * width];
+        this.lightmap[x + y * width] = 0;
+        r = ((c >> 16) & 0xff) * l / 255 + noise;
+        g = ((c >> 8) & 0xff) * l / 255 + noise;
+        b = ((c) & 0xff) * l / 255 + noise;
 
         r = r * (255 - game.getHurtTime()) / 255 + game.getHurtTime();
         g = g * (255 - game.getBonusTime()) / 255 + game.getBonusTime();
-        pixels[x + y * width] = r << 16 | g << 8 | b;
+        this.pixels[x + y * width] = r << 16 | g << 8 | b;
       }
       if (y % 2 == 0 && (y >= game.getDamage() && y < 220)) {
-        for (int x = 232; x < 238; x++) {
-          pixels[y * width + x] = 0x800000;
+        for (x = 232; x < 238; x++) {
+          this.pixels[y * width + x] = 0x800000;
         }
       }
       if (y % 2 == 0 && (y >= game.getAmmo() && y < 220)) {
-        for (int x = 224; x < 230; x++) {
-          pixels[y * width + x] = 0x808000;
+        for (x = 224; x < 230; x++) {
+          this.pixels[y * width + x] = 0x808000;
         }
       }
       if (y % 10 < 9 && (y >= game.getClips() && y < 220)) {
-        for (int x = 221; x < 222; x++) {
-          pixels[y * width + 221] = 0xffff00;
+        for (x = 221; x < 222; x++) {
+          this.pixels[y * width + 221] = 0xffff00;
         }
       }
     }
   }
 
-  private boolean isWithinView(int xm, int ym) {
+  isWithinView(xm, ym) {
     return xm > 0 && ym > 0 && xm < width && ym < height;
   }
 
-  void drawBulletTrace(double cos, double sin, int closestHitDist) {
-    int glow = 0;
-    for (int j = closestHitDist; j >= 0; j--) {
+  drawBulletTrace(cos, sin, closestHitDist) {
+    let glow = 0;
+    let i;
+    let xm;
+    let ym;
+    for (i = closestHitDist; i >= 0; i--) {
       // Calculate pixel position.
-      int xm = +(int) (cos * j) + width_half;
-      int ym = -(int) (sin * j) + height_half;
+      // xm = +(int) (cos * i) + width_half;
+      // ym = -(int) (sin * i) + height_half;
+      xm = +Math.floor(cos * i) + width_half;
+      ym = -Math.floor(sin * i) + height_half;
 
       // Are we still within the view?
-      if (isWithinView(xm, ym)) {
+      if (this.isWithinView(xm, ym)) {
 
         // Every so often, draw a white dot and renew the glow. This gives a
         // cool randomized effect that looks like spitting sparks.
         if (random.nextInt(20) == 0 || j == closestHitDist) {
-          pixels[xm + ym * width] = 0xffffff;
+          this.pixels[xm + ym * width] = 0xffffff;
           glow = 200;
         }
 
         // Either way, brighten up the path according to the current glow.
-        lightmap[xm + ym * width] += glow * (255 - lightmap[xm + ym * width])
-            / 255;
+        this.lightmap[xm + ym * width] += glow * (255 - this.lightmap[xm + ym * width]) / 255;
       }
 
       // Fade the glow.
@@ -274,58 +304,71 @@ class Viewport {
     }
   }
 
-  void drawBulletDebris(double playerDir, boolean hitMonster, Point hitPoint) {
-    for (int i = 0; i < 10; i++) {
-      double pow = random.nextInt(100) * random.nextInt(100) * 8.0 / 10000;
-      double dir = (random.nextInt(100) - random.nextInt(100)) / 100.0;
-      int xd = (int) (hitPoint.x - Math.cos(playerDir + dir) * pow)
-          + random.nextInt(4) - random.nextInt(4);
-      int yd = (int) (hitPoint.y - Math.sin(playerDir + dir) * pow)
-          + random.nextInt(4) - random.nextInt(4);
+  drawBulletDebris(playerDir, hitMonster, hitPoint) {
+    let i;
+    let pow;
+    let dir;
+    let xd;
+    let yd;
+    for (i = 0; i < 10; i++) {
+      pow = random.nextInt(100) * random.nextInt(100) * 8.0 / 10000;
+      dir = (random.nextInt(100) - random.nextInt(100)) / 100.0;
+      // xd = (int) (hitPoint.x - Math.cos(playerDir + dir) * pow) + random.nextInt(4) - random.nextInt(4);
+      // yd = (int) (hitPoint.y - Math.sin(playerDir + dir) * pow) + random.nextInt(4) - random.nextInt(4);
+      xd = Math.floor(hitPoint.x - Math.cos(playerDir + dir) * pow) + random.nextInt(4) - random.nextInt(4);
+      yd = Math.floor(hitPoint.y - Math.sin(playerDir + dir) * pow) + random.nextInt(4) - random.nextInt(4);
       if (xd >= 0 && yd >= 0 && xd < width && yd < height) {
         if (hitMonster) {
           // Blood
-          pixels[xd + yd * width] = 0xff0000;
+          this.pixels[xd + yd * width] = 0xff0000;
         } else {
           // Wall
-          pixels[xd + yd * width] = 0xcacaca;
+          this.pixels[xd + yd * width] = 0xcacaca;
         }
       }
     }
   }
 
-  void drawImpactFlash(Point hitPoint) {
-    for (int x = -12; x <= 12; x++) {
-      for (int y = -12; y <= 12; y++) {
-        Point offsetPoint = new Point(hitPoint.x + x, hitPoint.y + y);
-        if (offsetPoint.x >= 0 && offsetPoint.y >= 0 && offsetPoint.x < width
-            && offsetPoint.y < height) {
-          lightmap[offsetPoint.x + offsetPoint.y * width] += 2000
+  drawImpactFlash(hitPoint) {
+    let x;
+    let y;
+    let offsetPoint;
+    for (x = -12; x <= 12; x++) {
+      for (y = -12; y <= 12; y++) {
+        offsetPoint = new Point(hitPoint.x + x, hitPoint.y + y);
+        if (offsetPoint.x >= 0 && offsetPoint.y >= 0 && offsetPoint.x < width && offsetPoint.y < height) {
+          this.lightmap[offsetPoint.x + offsetPoint.y * width] += 2000
               / (x * x + y * y + 10)
-              * (255 - lightmap[offsetPoint.x + offsetPoint.y * width]) / 255;
+              * (255 - this.lightmap[offsetPoint.x + offsetPoint.y * width]) / 255;
         }
       }
     }
   }
 
-  void drawMonster(int tick, Monster monster, double playerDir, Point camera,
-      int xPos) {
+  drawMonster(tick, monster, playerDir, camera, xPos) {
+    let p;
+    let y;
+    let x;
+    let c;
+
     // Monster is active. Calculate position relative to player.
-    int xm = xPos - camera.x + width_half;
-    int ym = monster.position.y - camera.y + height_half;
+    let xm = xPos - camera.x + width_half;
+    let ym = monster.position.y - camera.y + height_half;
 
     // Get monster's direction. This is just for figuring out which sprite
     // to draw.
-    int d = monster.getDirection();
+    let d = monster.getDirection();
     if (monster.isPlayer()) {
       // or if this is the player, convert radian direction.
-      d = (((int) (playerDir / (Math.PI * 2) * 16 + 4.5 + 16)) & 15);
+      // d = (((int) (playerDir / (Math.PI * 2) * 16 + 4.5 + 16)) & 15);
+      d = ((Math.floor(playerDir / (Math.PI * 2) * 16 + 4.5 + 16)) & 15);
     }
 
     d += ((monster.getFrame() / 4) & 3) * 16;
 
     // If non-special monster, convert to actual sprite pixel offset.
-    int p = (0 * 16 + d) * 144;
+    // TODO: What's up with the 0?
+    p = (0 * 16 + d) * 144;
     if (!monster.isPlayer()) {
       p += ((monster.getIndex() & 15) + 1) * 144 * 16 * 4;
     }
@@ -337,57 +380,61 @@ class Viewport {
     }
 
     // Render the monster.
-    for (int y = ym - 6; y < ym + 6; y++) {
-      for (int x = xm - 6; x < xm + 6; x++) {
-        int c = sprites[p++];
+    for (y = ym - 6; y < ym + 6; y++) {
+      for (x = xm - 6; x < xm + 6; x++) {
+        c = this.sprites[p++];
         if (c > 0 && x >= 0 && y >= 0 && x < width && y < height) {
-          pixels[x + y * width] = c;
+          this.pixels[x + y * width] = c;
         }
       }
     }
   }
 
-  private void copyView(Map map, Point camera) {
-    for (int y = 0; y < height; y++) {
-      int xm = camera.x - (width >> 1);
-      int ym = y + camera.y - (height >> 1);
-      for (int x = 0; x < width; x++) {
-        pixels[x + y * width] = map.getElementSafe(xm + x, ym);
+  copyView(map, camera) {
+    let x;
+    let y;
+    let xm;
+    let ym;
+    for (y = 0; y < height; y++) {
+      xm = camera.x - (width >> 1);
+      ym = y + camera.y - (height >> 1);
+      for (x = 0; x < width; x++) {
+        this.pixels[x + y * width] = map.getElementSafe(xm + x, ym);
       }
     }
   }
 
-  private void drawStatusText(Game game, UserInput userInput) {
-    ogr.drawString("" + game.getScore(), 4, 232);
+  drawStatusText(game, userInput) {
+    this.ogr.drawString("" + game.getScore(), 4, 232);
     if (!game.isStarted()) {
-      ogr.drawString("Left 4k Dead", 80, 70);
+      this.ogr.drawString("Left 4k Dead", 80, 70);
       if (userInput.isTriggerPressed() && game.getHurtTime() == 0) {
         game.markGameStarted();
         userInput.setTriggerPressed(false);
       }
     } else if (game.getTick() < 60) {
-      game.drawLevel(ogr);
+      game.drawLevel(this.ogr);
     }
   }
 
-  private void drawToScreen(int screen_width, int screen_height) {
-    sg.drawImage(image, 0, 0, screen_width, screen_height, 0, 0, width, height,
-        null);
+  drawToScreen(screen_width, screen_height) {
+    this.sg.drawImage(this.image, 0, 0, screen_width, screen_height, 0, 0, width, height, null);
   }
 
-  void completeFrame(Game game, UserInput userInput) {
-    drawNoiseAndHUD(game);
-    drawStatusText(game, userInput);
-    drawToScreen(screenWidth, screenHeight);
+  completeFrame(game, userInput) {
+    this.drawNoiseAndHUD(game);
+    this.drawStatusText(game, userInput);
+    this.drawToScreen(screenWidth, screenHeight);
   }
 
-  void prepareFrame(Game game, Map map, Point camera, double playerDir) {
-    calculateLightmap(map, game.getTick(), playerDir, camera);
-    copyView(map, camera);
+  prepareFrame(game, map, camera, playerDir) {
+    this.calculateLightmap(map, game.getTick(), playerDir, camera);
+    this.copyView(map, camera);
   }
 
-  int handleShot(Game game, UserInput userInput, boolean wasMonsterHit,
-      double playerDir, double cos, double sin, int closestHitDistance) {
+  handleShot(game, userInput, wasMonsterHit, playerDir, cos, sin, closestHitDistance) {
+    let hitPoint;
+    
     // Is the ammo used up?
     if (!game.isAmmoAvailable()) {
       // Yes.
@@ -401,16 +448,16 @@ class Viewport {
       game.consumeAmmo(4);
     }
 
-    drawBulletTrace(cos, sin, closestHitDistance);
+    this.drawBulletTrace(cos, sin, closestHitDistance);
 
     // Did the bullet hit within view?
     if (closestHitDistance < width_half) {
       closestHitDistance -= 3;
-      Point hitPoint = new Point((int) (width_half + cos * closestHitDistance),
-          (int) (height_half - sin * closestHitDistance));
+      // hitPoint = new Point((int) (width_half + cos * closestHitDistance), (int) (height_half - sin * closestHitDistance));
+      hitPoint = new Point(Math.floot(width_half + cos * closestHitDistance), Math.floot(height_half - sin * closestHitDistance));
 
-      drawImpactFlash(hitPoint);
-      drawBulletDebris(playerDir, wasMonsterHit, hitPoint);
+      this.drawImpactFlash(hitPoint);
+      this.drawBulletDebris(playerDir, wasMonsterHit, hitPoint);
     }
 
     return closestHitDistance;
