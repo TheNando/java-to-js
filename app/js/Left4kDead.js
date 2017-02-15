@@ -1,10 +1,9 @@
-// import java.awt.AWTEvent;
-// import java.awt.FlowLayout;
-// import java.awt.Frame;
-// import java.awt.event.KeyEvent;
-// import java.awt.event.MouseEvent;
-// import java.awt.event.WindowEvent;
-// import java.util.Random;
+import Game from './Game';
+import Map from './Map';
+import Monster from './Monster';
+import Point from './Point';
+import UserInput from './UserInput';
+import Viewport from './Viewport';
 
 const MAX_MONSTERS = 320;
 const VIEWPORT_WIDTH = 240;
@@ -271,7 +270,7 @@ class Left4kDead {
       }
 
       for (i = 0; i < 2; i++) {
-        shouldSkip = new Boolean(false);
+        shouldSkip = false;
         moved = this.doOneMovementIteration(monster, moved, i, shouldSkip, distanceToPlayer);
         if (shouldSkip)
           return;

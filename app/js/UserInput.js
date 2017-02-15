@@ -1,5 +1,3 @@
-// import java.awt.event.KeyEvent;
-
 class UserInput {
   constructor() {
     this.k = new boolean[32767];
@@ -31,3 +29,5 @@ class UserInput {
     this.k[keyCode] = isPressed;
   }
 }
+
+export default UserInput;

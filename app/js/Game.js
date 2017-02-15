@@ -1,9 +1,3 @@
-// import java.awt.Graphics;
-// import java.util.Random;
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
-}
-
 class Game {
   constructor() {
     // Fields that are reset during attract.
@@ -55,9 +49,9 @@ class Game {
     this.hurtTime /= 2;
   }
 
-  // drawLevel(ogr) {
-  //   ogr.drawString('Level ' + this.level, 90, 70);
-  // }
+  drawLevel(ogr) {
+    ogr.drawString('Level ' + this.level, 90, 70);
+  }
 
   inflictNibbleDamage() {
     this.damage += 1;
@@ -133,3 +127,5 @@ class Game {
     console.log(`Advancing to level ${level}...`);
   }
 }
+
+export default Game;

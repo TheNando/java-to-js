@@ -1,7 +1,4 @@
-// import java.awt.Graphics;
-// import java.awt.image.BufferedImage;
-// import java.awt.image.DataBufferInt;
-// import java.util.Random;
+import Point from './Point';
 
 const PIXEL_ZOMBIE_SKIN = 0xa0ff90;
 const PIXEL_SKIN = 0xFF9993;
@@ -24,7 +21,7 @@ class Viewport {
     this.sg = graphics;
 
     // Array of game image
-    this.pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
+    // TODO: this.pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
     this.lightmap = new int[width * height];
 
     this.brightness = new int[512];
@@ -462,5 +459,6 @@ class Viewport {
 
     return closestHitDistance;
   }
-
 }
+
+export default Viewport;

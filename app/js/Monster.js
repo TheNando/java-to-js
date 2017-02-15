@@ -1,4 +1,4 @@
-// import java.util.Random;
+import Point from './Point';
 
 class Monster {
   constructor(index) {
@@ -183,3 +183,5 @@ class Monster {
     }
   }
 }
+
+export default Monster;

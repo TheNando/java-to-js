@@ -1,5 +1,3 @@
-// import java.util.Random;
-
 const PIXEL_MASK_WALL = 0xff0000;
 const PIXEL_MONSTER_HEAD = 0xFFFFFE;
 const PIXEL_INNER_WALL = 0xFFFFFF;
@@ -213,5 +211,6 @@ class Map {
       }
     }
   }
-
 }
+
+export default Map;
