@@ -2,6 +2,7 @@ import Game from './Game';
 import Map from './Map';
 import Monster from './Monster';
 import Point from './Point';
+import Random from './Random';
 import UserInput from './UserInput';
 import Viewport from './Viewport';
 
@@ -18,12 +19,13 @@ const SCREEN_HEIGHT = VIEWPORT_HEIGHT * 2;
 
 class Left4kDead {
   constructor() {
-    this.userInput = new UserInput();
-    this.game = new Game();
     this.map = null;
+    this.closestHit = null;
+    this.closestHitDistance = null;
 
-    this.closestHit;
-    this.closestHitDistance;
+    this.game = new Game();
+    this.random = Random.instance;
+    this.userInput = new UserInput();
   }
 
   run() {
@@ -54,13 +56,14 @@ class Left4kDead {
       endRoomTopLeft = new Point(0, 0);
       endRoomBottomRight = new Point(0, 0);
 
-      // Make the levels random but repeatable.
-      random = this.game.randomForLevel();
+      // TODO: Disabled until good performance, seedable random
+      // // Make the levels random but repeatable.
+      // random = this.game.randomForLevel();
 
       this.map = new Map(1024, 1024);
 
       startPoint = new Point(0, 0);
-      this.map.generate(random, startPoint, endRoomTopLeft, endRoomBottomRight);
+      this.map.generate(startPoint, endRoomTopLeft, endRoomBottomRight);
 
       monsters = new Monster[MAX_MONSTERS];
       for (i = 0; i < MAX_MONSTERS; ++i) {
@@ -79,12 +82,12 @@ class Left4kDead {
       while (true) {
         if (this.game.isStarted()) {
           this.game.advanceTick();
-          this.game.advanceRushTime(random);
+          this.game.advanceRushTime();
 
           mouse = this.userInput.mouseEvent;
           playerDir = Math.atan2(mouse / VIEWPORT_WIDTH - VIEWPORT_WIDTH_HALF, mouse % VIEWPORT_HEIGHT - VIEWPORT_HEIGHT_HALF);
 
-          shootDir = playerDir + (random.nextInt(100) - random.nextInt(100)) / 100.0 * 0.2;
+          shootDir = playerDir + (this.random.nextInt(100) - this.random.nextInt(100)) / 100.0 * 0.2;
           cos = Math.cos(-shootDir);
           sin = Math.sin(-shootDir);
 
@@ -192,8 +195,8 @@ class Left4kDead {
       // Try to activate it.
 
       // Pick a random spot to put it.
-      xPos = (random.nextInt(62) + 1) * 16 + 8;
-      yPos = (random.nextInt(62) + 1) * 16 + 8;
+      xPos = (this.random.nextInt(62) + 1) * 16 + 8;
+      yPos = (this.random.nextInt(62) + 1) * 16 + 8;
 
       distance = new Point(camera.x - xPos, camera.y - yPos);
       if (this.isTooCloseToSpawn(distance)) {
@@ -259,7 +262,7 @@ class Left4kDead {
         this.game.inflictNibbleDamage();
       }
 
-      if (monster.canSeePlayer(rx, ry) && random.nextInt(10) == 0) {
+      if (monster.canSeePlayer(rx, ry) && this.random.nextInt(10) == 0) {
         monster.agitate();
       }
 
@@ -335,13 +338,14 @@ class Left4kDead {
       // Move generally toward the player.
       xxd = Math.sqrt(distanceToPlayer.x * distanceToPlayer.x);
       yyd = Math.sqrt(distanceToPlayer.y * distanceToPlayer.y);
-      if (random.nextInt(1024) / 1024.0 < yyd / xxd) {
+      // if (this.random.nextInt(1024) / 1024.0 < yyd / xxd) {
+      if (this.random.nextInt(128) / 128.0 < yyd / xxd) {
         if (distanceToPlayer.y < 0)
           movement.y -= 1;
         if (distanceToPlayer.y > 0)
           movement.y += 1;
       }
-      if (random.nextInt(1024) / 1024.0 < xxd / yyd) {
+      if (this.random.nextInt(128) / 128.0 < xxd / yyd) {
         if (distanceToPlayer.x < 0)
           movement.x -= 1;
         if (distanceToPlayer.x > 0)

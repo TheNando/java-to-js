@@ -1,3 +1,5 @@
+import Random from './Random';
+
 class Game {
   constructor() {
     // Fields that are reset during attract.
@@ -14,6 +16,8 @@ class Game {
     this.rushTime = null;
     this.shootDelay = null;
     this.tick = null;
+
+    this.random = Random.instance;
   }
   
   addScoreForMonsterDeath() {
@@ -23,7 +27,7 @@ class Game {
   advanceRushTime() {
     this.rushTime += 1;
     if (this.rushTime >= 150) {
-      this.rushTime = -random.nextInt(2000);
+      this.rushTime = -this.random.nextInt(200) * 10;
     }
   }
 
@@ -76,9 +80,10 @@ class Game {
     console.log('Starting new game...');
   }
 
-  randomForLevel() {
-    return new Random(4329 + this.level);
-  }
+  // TODO: Disabled until good performance, seedable random
+  // randomForLevel() {
+  //   return new Random(4329 + this.level);
+  // }
 
   reloadGun() {
     this.shootDelay = 30;

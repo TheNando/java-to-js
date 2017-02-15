@@ -12,6 +12,7 @@ class Monster {
 
     this.index = index;
     this.position = new Point(0, 0);
+    this.random = Random.instance;
   }
 
   advanceSpriteFrame() {
@@ -86,7 +87,7 @@ class Monster {
   }
 
   pickWanderDirection() {
-    this.wanderDirection = random.nextInt(25);
+    this.wanderDirection = this.random.nextInt(25);
   }
 
   place(x, y, rushTime, pixelToSave) {
@@ -97,7 +98,7 @@ class Monster {
     this.savedMapPixel = pixelToSave;
 
     // Mark monster as idle or attacking.
-    this.rage = (rushTime > 0 || random.nextInt(3) == 0) ? 127 : 0;
+    this.rage = (rushTime > 0 || this.random.nextInt(3) == 0) ? 127 : 0;
 
     // Mark monster active.
     this.activity = 1;
@@ -121,7 +122,7 @@ class Monster {
     let yd;
 
     // Add to monster's cumulative damage and reset temporary damage.
-    this.activity += random.nextInt(3) + 1;
+    this.activity += this.random.nextInt(3) + 1;
     this.damage = 0;
 
     rot = 0.25; // How far around the blood spreads, radians
@@ -140,11 +141,11 @@ class Monster {
 
     // Draw blood.
     for (i = 0; i < amount; i++) {
-      pow = (random.nextInt(100) * random.nextInt(100)) * poww / 10000 + 4;
-      dir = (random.nextInt(100) - random.nextInt(100)) / 100.0 * rot;
-      xdd = (Math.cos(playerDir + dir) * pow) + random.nextInt(4) - random.nextInt(4);
-      ydd = (Math.sin(playerDir + dir) * pow) + random.nextInt(4) - random.nextInt(4);
-      col = (random.nextInt(128) + 120);
+      pow = (this.random.nextInt(100) * this.random.nextInt(100)) * poww / 10000 + 4;
+      dir = (this.random.nextInt(100) - this.random.nextInt(100)) / 100.0 * rot;
+      xdd = (Math.cos(playerDir + dir) * pow) + this.random.nextInt(4) - this.random.nextInt(4);
+      ydd = (Math.sin(playerDir + dir) * pow) + this.random.nextInt(4) - this.random.nextInt(4);
+      col = (this.random.nextInt(128) + 120);
 
       // TODO: loop label
       bloodLoop: for (j = 2; j < pow; j++) {
@@ -159,7 +160,7 @@ class Monster {
         }
 
         // Occasionally splat some blood and darken it.
-        if (random.nextInt(2) != 0) {
+        if (this.random.nextInt(2) != 0) {
           map.setElementSafe(xd, yd, col << 16);
           col = col * 8 / 9;
         }
@@ -177,7 +178,7 @@ class Monster {
     if (this.wanderDirection != 12) {
       distanceToPlayer.x = (this.wanderDirection) % 5 - 2;
       distanceToPlayer.y = (this.wanderDirection) / 5 - 2;
-      if (random.nextInt(10) == 0) {
+      if (this.random.nextInt(10) == 0) {
         this.wanderDirection = 12;
       }
     }

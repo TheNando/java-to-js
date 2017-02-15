@@ -1,3 +1,5 @@
+import Random from './Random';
+
 const PIXEL_MASK_WALL = 0xff0000;
 const PIXEL_MONSTER_HEAD = 0xFFFFFE;
 const PIXEL_INNER_WALL = 0xFFFFFF;
@@ -8,9 +10,10 @@ const ROOM_COUNT = 70;
 
 class Map {
   constructor(width, height) {
-    this.width = width;
-    this.height = height;
     this.elements = new int[width * height];
+    this.height = height;
+    this.random = Random.instance;
+    this.width = width;
   }
 
   getElement(x, y) {
@@ -75,7 +78,7 @@ class Map {
     return this.getElementSafe(x, y) >= PIXEL_MASK_WALL;
   }
 
-  generate(random, startPoint, endRoomTopLeft, endRoomBottomRight) {
+  generate(startPoint, endRoomTopLeft, endRoomBottomRight) {
     let x;
     let y;
     let i;
@@ -93,7 +96,7 @@ class Map {
     // Put a wall around the perimeter.
     for (y = 0; y < height; y++) {
       for (x = 0; x < width; x++) {
-        br = random.nextInt(32) + 112;
+        br = this.random.nextInt(32) + 112;
         this.setElement(x, y, (br / 3) << 16 | (br) << 8);
         if (x < 4 || y < 4 || x >= (width - 4) || y >= (height - 4)) {
           this.setOuterWall(x, y);
@@ -108,10 +111,10 @@ class Map {
 
       // Create a room that's possibly as big as the level, whose coordinates
       // are clamped to the nearest multiple of 16.
-      let w = random.nextInt(8) + 2;
-      let h = random.nextInt(8) + 2;
-      let xm = random.nextInt(64 - w - 2) + 1;
-      let ym = random.nextInt(64 - h - 2) + 1;
+      let w = this.random.nextInt(8) + 2;
+      let h = this.random.nextInt(8) + 2;
+      let xm = this.random.nextInt(64 - w - 2) + 1;
+      let ym = this.random.nextInt(64 - h - 2) + 1;
 
       w *= 16;
       h *= 16;
@@ -150,7 +153,7 @@ class Map {
             // Yes, we are. Draw the floor.
 
             // Vary the color of the floor.
-            br = random.nextInt(16) + 112;
+            br = this.random.nextInt(16) + 112;
 
             // Floor diagonal
             if (((x + y) & 3) == 0) {
@@ -172,24 +175,24 @@ class Map {
 
       // Put two exits in the room.
       for (j = 0; j < 2; j++) {
-        xGap = random.nextInt(w - 24) + xm + 5;
-        yGap = random.nextInt(h - 24) + ym + 5;
+        xGap = this.random.nextInt(w - 24) + xm + 5;
+        yGap = this.random.nextInt(h - 24) + ym + 5;
         ww = 5;
         hh = 5;
 
         xGap = xGap / 16 * 16 + 5;
         yGap = yGap / 16 * 16 + 5;
-        if (random.nextInt(2) == 0) {
-          xGap = xm + (w - 5) * random.nextInt(2);
+        if (this.random.nextInt(2) == 0) {
+          xGap = xm + (w - 5) * this.random.nextInt(2);
           hh = 11;
         } else {
           ww = 11;
-          yGap = ym + (h - 5) * random.nextInt(2);
+          yGap = ym + (h - 5) * this.random.nextInt(2);
         }
         for (y = yGap; y < yGap + hh; y++) {
           for (x = xGap; x < xGap + ww; x++) {
             // A slightly darker color represents the exit.
-            br = random.nextInt(32) + 112 - 64;
+            br = this.random.nextInt(32) + 112 - 64;
             this.setElement(x, y, (br * 3 / 3) << 16 | (br * 4 / 4) << 8 | (br * 4 / 4));
           }
         }

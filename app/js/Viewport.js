@@ -29,6 +29,8 @@ class Viewport {
 
     this.sprites = new int[18 * 4 * 16 * 12 * 12];
     this.generateSprites();
+
+    this.random = Random.instance;
   }
 
   /**
@@ -56,7 +58,7 @@ class Viewport {
 
       if (i > 0) {
         skin = PIXEL_ZOMBIE_SKIN;
-        clothes = (random.nextInt(0x1000000) & 0x7f7f7f);
+        clothes = ((this.random.nextInt(256) * this.random.nextInt(256) * this.random.nextInt(256)) & 0x7f7f7f);
       }
       for (t = 0; t < 4; t++) {
         for (d = 0; d < 16; d++) {
@@ -233,7 +235,7 @@ class Viewport {
     let b;
     for (y = 0; y < height; y++) {
       for (x = 0; x < width; x++) {
-        noise = random.nextInt(16) * random.nextInt(16) / 16;
+        noise = this.random.nextInt(16) * this.random.nextInt(16) / 16;
         if (!game.isStarted())
           noise *= 4;
 
@@ -287,7 +289,7 @@ class Viewport {
 
         // Every so often, draw a white dot and renew the glow. This gives a
         // cool randomized effect that looks like spitting sparks.
-        if (random.nextInt(20) == 0 || j == closestHitDist) {
+        if (this.random.nextInt(20) == 0 || j == closestHitDist) {
           this.pixels[xm + ym * width] = 0xffffff;
           glow = 200;
         }
@@ -308,12 +310,12 @@ class Viewport {
     let xd;
     let yd;
     for (i = 0; i < 10; i++) {
-      pow = random.nextInt(100) * random.nextInt(100) * 8.0 / 10000;
-      dir = (random.nextInt(100) - random.nextInt(100)) / 100.0;
-      // xd = (int) (hitPoint.x - Math.cos(playerDir + dir) * pow) + random.nextInt(4) - random.nextInt(4);
-      // yd = (int) (hitPoint.y - Math.sin(playerDir + dir) * pow) + random.nextInt(4) - random.nextInt(4);
-      xd = Math.floor(hitPoint.x - Math.cos(playerDir + dir) * pow) + random.nextInt(4) - random.nextInt(4);
-      yd = Math.floor(hitPoint.y - Math.sin(playerDir + dir) * pow) + random.nextInt(4) - random.nextInt(4);
+      pow = this.random.nextInt(100) * this.random.nextInt(100) * 8.0 / 10000;
+      dir = (this.random.nextInt(100) - this.random.nextInt(100)) / 100.0;
+      // xd = (int) (hitPoint.x - Math.cos(playerDir + dir) * pow) + this.random.nextInt(4) - this.random.nextInt(4);
+      // yd = (int) (hitPoint.y - Math.sin(playerDir + dir) * pow) + this.random.nextInt(4) - this.random.nextInt(4);
+      xd = Math.floor(hitPoint.x - Math.cos(playerDir + dir) * pow) + this.random.nextInt(4) - this.random.nextInt(4);
+      yd = Math.floor(hitPoint.y - Math.sin(playerDir + dir) * pow) + this.random.nextInt(4) - this.random.nextInt(4);
       if (xd >= 0 && yd >= 0 && xd < width && yd < height) {
         if (hitMonster) {
           // Blood
