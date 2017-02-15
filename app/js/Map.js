@@ -10,7 +10,7 @@ const ROOM_COUNT = 70;
 
 class Map {
   constructor(width, height) {
-    this.elements = new int[width * height];
+    this.elements = new Int32Array(width * height);
     this.height = height;
     this.random = Random.instance;
     this.width = width;

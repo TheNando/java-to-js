@@ -14,7 +14,7 @@ class Random {
     this.valuesBuffer = null;
 
     // Watch the threshold to repopulate buffer
-    window.setInterval(this.checkThreshold, 100);
+    window.setInterval(this.checkThreshold, 200);
   }
 
   static get instance() {

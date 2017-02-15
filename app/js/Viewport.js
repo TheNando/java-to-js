@@ -22,12 +22,12 @@ class Viewport {
 
     // Array of game image
     // TODO: this.pixels = ((DataBufferInt) this.image.getRaster().getDataBuffer()).getData();
-    this.lightmap = new int[width * height];
+    this.lightmap = new Uint8ClampedArray(width * height);
 
-    this.brightness = new int[512];
+    this.brightness = new Uint8ClampedArray(512);
     this.generateBrightness();
 
-    this.sprites = new int[18 * 4 * 16 * 12 * 12];
+    this.sprites = new Int32Array(18 * 4 * 16 * 12 * 12);
     this.generateSprites();
 
     this.random = Random.instance;
