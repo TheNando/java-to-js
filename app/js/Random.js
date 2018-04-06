@@ -14,7 +14,8 @@ class Random {
     this.valuesBuffer = null
 
     // Watch the threshold to repopulate buffer
-    window.setInterval(this.checkThreshold, 200)
+    // TODO: This doesn't work because game loop locks thread
+    window.setInterval(() => { this.checkThreshold() }, 200)
   }
 
   static get instance() {
@@ -48,7 +49,7 @@ class Random {
 
   // Doesn't work for 0, but luckily, we won't need to check for 0
   isPowerOfTwo(num) {
-    return (x & (x - 1)) == 0
+    return (num & (num - 1)) == 0
   }
 
   nextInt(number) {

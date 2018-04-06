@@ -1,6 +1,6 @@
 class UserInput {
   constructor() {
-    this.k = new boolean[32767]()
+    this.k = {}
     this.mouseEvent = null
     this.isTriggerPressed = false
   }

@@ -1,3 +1,5 @@
+import Alea from 'alea'
+
 import Point from './Point'
 
 const PIXEL_ZOMBIE_SKIN = 0xa0ff90
@@ -30,7 +32,8 @@ class Viewport {
     this.sprites = new Int32Array(18 * 4 * 16 * 12 * 12)
     this.generateSprites()
 
-    this.random = Random.instance
+    this.random = new Alea()
+    this.random.nextInt = (max) => this.random() * max | 0
   }
 
   /**

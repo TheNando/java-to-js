@@ -1,8 +1,9 @@
+import Alea from 'alea'
+
 import Game from './Game'
 import Map from './Map'
 import Monster from './Monster'
 import Point from './Point'
-import Random from './Random'
 import UserInput from './UserInput'
 import Viewport from './Viewport'
 
@@ -24,7 +25,8 @@ class Left4kDead {
     this.closestHitDistance = null
 
     this.game = new Game()
-    this.random = Random.instance
+    this.random = new Alea()
+    this.random.nextInt = (max) => this.random() * max | 0
     this.userInput = new UserInput()
   }
 
@@ -65,7 +67,7 @@ class Left4kDead {
       startPoint = new Point(0, 0)
       this.map.generate(startPoint, endRoomTopLeft, endRoomBottomRight)
 
-      monsters = new Monster[MAX_MONSTERS]()
+      monsters = []
       for (i = 0; i < MAX_MONSTERS; ++i) {
         monsters[i] = new Monster(i)
       }
@@ -491,8 +493,8 @@ class Left4kDead {
   }
 }
 
-left4kDead = new Left4kDead()
-left4kDead.setSize(SCREEN_WIDTH, SCREEN_HEIGHT)
-left4kDead.setVisible(true)
-left4kDead.setLayout(new FlowLayout())
+const left4kDead = new Left4kDead()
+// left4kDead.setSize(SCREEN_WIDTH, SCREEN_HEIGHT)
+// left4kDead.setVisible(true)
+// left4kDead.setLayout(new FlowLayout())
 left4kDead.run()

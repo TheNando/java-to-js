@@ -1,4 +1,4 @@
-import Random from './Random'
+import Alea from 'alea'
 
 class Game {
   constructor() {
@@ -17,7 +17,8 @@ class Game {
     this.shootDelay = null
     this.tick = null
 
-    this.random = Random.instance
+    this.random = new Alea()
+    this.random.nextInt = (max) => this.random() * max | 0
   }
 
   addScoreForMonsterDeath() {
@@ -129,7 +130,7 @@ class Game {
   winLevel() {
     this.level += 1
     this.tick = 0
-    console.log(`Advancing to level ${level}...`)
+    console.log(`Advancing to level ${this.level}...`)
   }
 }
 

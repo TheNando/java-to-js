@@ -6,29 +6,15 @@
   "author": "Nando Pena <fernando.pena@rackspace.com>",
   "license": "MIT",
   "scripts": {
-    "start": "parcel serve app/index.html",
+    "start": "parcel serve --no-cache app/index.html",
     "build": "parcel build app/index.html --public-url /"
   },
   "dependencies": {
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-preset-stage-3": "^6.24.1",
-    "babel-runtime": "^6.26.0",
+    "alea": "^0.0.9",
     "parcel-bundler": "^1.6.2"
   },
   "devDependencies": {
     "prettier": "1.11.1"
-  },
-  "babel": {
-    "presets": ["stage-3"],
-    "plugins": [
-      [
-        "transform-runtime",
-        {
-          "polyfill": false,
-          "regenerator": true
-        }
-      ]
-    ]
   },
   "prettier": {
     "semi": false,

@@ -1,4 +1,4 @@
-import Random from './Random'
+import Alea from 'alea'
 
 const PIXEL_MASK_WALL = 0xff0000
 const PIXEL_MONSTER_HEAD = 0xfffffe
@@ -12,29 +12,30 @@ class Map {
   constructor(width, height) {
     this.elements = new Int32Array(width * height)
     this.height = height
-    this.random = Random.instance
+    this.random = new Alea()
+    this.random.nextInt = (max) => this.random() * max | 0
     this.width = width
   }
 
   getElement(x, y) {
-    return this.elements[x + y * width]
+    return this.elements[x + y * this.width]
   }
 
   getElementSafe(x, y) {
-    return this.elements[(x + y * width) & (width * height - 1)]
+    return this.elements[(x + y * this.width) & (this.width * this.height - 1)]
   }
 
   setElement(x, y, pixel) {
-    this.elements[x + y * width] = pixel
+    this.elements[x + y * this.width] = pixel
   }
 
   setElementSafe(x, y, pixel) {
-    this.elements[(x + y * width) & (width * height - 1)] = pixel
+    this.elements[(x + y * this.width) & (this.width * this.height - 1)] = pixel
   }
 
   maskEndRoom(x, y) {
     // Give the end room a red tint.
-    this.elements[x + y * width] &= PIXEL_MASK_END_ROOM
+    this.elements[x + y * this.width] &= PIXEL_MASK_END_ROOM
   }
 
   isWall(x, y) {
@@ -94,11 +95,11 @@ class Map {
 
     // Draw the floor of the level with an uneven green color.
     // Put a wall around the perimeter.
-    for (y = 0; y < height; y++) {
-      for (x = 0; x < width; x++) {
+    for (y = 0; y < this.height; y++) {
+      for (x = 0; x < this.width; x++) {
         br = this.random.nextInt(32) + 112
         this.setElement(x, y, ((br / 3) << 16) | (br << 8))
-        if (x < 4 || y < 4 || x >= width - 4 || y >= height - 4) {
+        if (x < 4 || y < 4 || x >= this.width - 4 || y >= this.height - 4) {
           this.setOuterWall(x, y)
         }
       }
@@ -204,9 +205,9 @@ class Map {
     }
 
     // Paint the inside of each wall white. This is for wall-collision detection.
-    for (y = 1; y < height - 1; y++) {
+    for (y = 1; y < this.height - 1; y++) {
       // TODO: loop label
-      inloop: for (x = 1; x < width - 1; x++) {
+      inloop: for (x = 1; x < this.width - 1; x++) {
         for (xx = x - 1; xx <= x + 1; xx++) {
           for (yy = y - 1; yy <= y + 1; yy++) {
             if (!this.isAnyWall(xx, yy)) {
