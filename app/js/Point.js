@@ -1,12 +1,12 @@
 class Point {
   constructor(x, y) {
-    this.x = x;
-    this.y = y;
+    this.x = x
+    this.y = y
   }
 
   toString() {
-    return `Point [x=${this.x}, y=${this.y}]`;
+    return `Point [x=${this.x}, y=${this.y}]`
   }
 }
 
-export default Point;
+export default Point
