@@ -33,7 +33,7 @@ class Viewport {
     this.generateSprites()
 
     this.random = new Alea()
-    this.random.nextInt = (max) => this.random() * max | 0
+    this.random.nextInt = max => (this.random() * max) | 0
   }
 
   /**

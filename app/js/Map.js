@@ -13,7 +13,7 @@ class Map {
     this.elements = new Int32Array(width * height)
     this.height = height
     this.random = new Alea()
-    this.random.nextInt = (max) => this.random() * max | 0
+    this.random.nextInt = max => (this.random() * max) | 0
     this.width = width
   }
 

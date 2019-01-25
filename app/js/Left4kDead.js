@@ -26,7 +26,7 @@ class Left4kDead {
 
     this.game = new Game()
     this.random = new Alea()
-    this.random.nextInt = (max) => this.random() * max | 0
+    this.random.nextInt = max => (this.random() * max) | 0
     this.userInput = new UserInput()
   }
 

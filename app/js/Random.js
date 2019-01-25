@@ -15,7 +15,9 @@ class Random {
 
     // Watch the threshold to repopulate buffer
     // TODO: This doesn't work because game loop locks thread
-    window.setInterval(() => { this.checkThreshold() }, 200)
+    window.setInterval(() => {
+      this.checkThreshold()
+    }, 200)
   }
 
   static get instance() {

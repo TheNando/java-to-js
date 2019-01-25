@@ -14,7 +14,7 @@ class Monster {
     this.index = index
     this.position = new Point(0, 0)
     this.random = new Alea()
-    this.random.nextInt = (max) => this.random() * max | 0
+    this.random.nextInt = max => (this.random() * max) | 0
   }
 
   advanceSpriteFrame() {
